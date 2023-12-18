@@ -1,0 +1,8 @@
+.mainPage {
+  display: flex;
+}
+
+.mainPage__side {
+  display: flex;
+  width: 100%;
+}
