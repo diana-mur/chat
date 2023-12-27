@@ -1,8 +1,5 @@
 import models from "../models/models.js";
-import ApiError from "../error/ApiError.js"
-import sequelize from "../db.js";
-import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
+import { Op } from "sequelize";
 
 const User = models.User;
 const Chat = models.Chat;
@@ -21,19 +18,24 @@ class UserController {
         res.json({ message: "Данные введены некорректно" })
     }
 
-    // Получение списка аккаунтов 
-    // и Списка чатов для определённого пользователя
-    // Вывод последнего сообщения в истории диалога с именем автора
-    // убрала await в двух местах
-    async getUserList(req, res) {
+    // Получение списка аккаунтов (без аккаунта, в котором авторизован)
+    async userList(req, res) {
         // id получили из расшифрованного токена, т.к. его занесли в переменную user
         const { id } = req.user // ID пользователя
-        const listUsers = await User.findAll()
+        const userList = await User.findAll({ where: { id: { [Op.ne]: id } } })
+        res.json({ userList })
+    }
+
+    // Получение списка чатов для определённого пользователя
+    // Вывод последнего сообщения в истории диалога с именем автора
+    async chatList(req, res) {
+        // id получили из расшифрованного токена, т.к. его занесли в переменную user
+        const { id } = req.user // ID пользователя
         const listChat_settings = await Chat_settings.findAll({ where: { userId: id } })
         let ARRAY_listChats = []
         for (let i = 0; i < listChat_settings.length; i++) {
-            const listChats = Chat.findOne({ where: { id: listChat_settings[i].chatId } })
-            const lastMessage = Message.findAll({ limit: 1, where: { chatId: listChat_settings[i].chatId }, order: [["createdAt", "DESC"]] })
+            const listChats = Chat.findOne({ where: { id: listChat_settings[i].chatId } }) // убрала await
+            const lastMessage = Message.findAll({ limit: 1, where: { chatId: listChat_settings[i].chatId }, order: [["createdAt", "DESC"]] }) // убрала await
             ARRAY_listChats.push({ author: listChats, lastmess: lastMessage })
         }
         res.json({ listUsers, ARRAY_listChats })
@@ -41,30 +43,26 @@ class UserController {
 
     // создание личного чата
     async createChat(req, res) {
-        const { chat_name, user_id } = req.body
+        const { user_id } = req.body
         const { id } = req.user
         const checkUniqueId = await Chat_settings.findAll({ where: { userId: id } })
         const checkUniqueUser_id = await Chat_settings.findAll({ where: { userId: user_id } })
 
-        for (let i = 0;
-            i < (checkUniqueId.length >= checkUniqueUser_id.length ? checkUniqueId.length : checkUniqueUser_id.length); // возвращается длина большего массива
-            i++) {
-            for (let n = 0;
-                n < (checkUniqueId.length < checkUniqueUser_id.length ? checkUniqueId.length : checkUniqueUser_id.length); // возвращается длина меньшего массива
-                n++) {
+        for (let i = 0; i < checkUniqueId.length; i++) {
+            for (let n = 0; n < checkUniqueUser_id.length; n++) {
                 if (checkUniqueId[i].chatId == checkUniqueUser_id[n].chatId) {
                     const checkUnique = await Chat.findOne({ where: { id: checkUniqueId[i].chatId } })
                     if (checkUnique.type === "CHAT") {
-                        return res.json({ message: `Чат уже существует с id ${checkUnique.id}` })
+                        return res.json({ result: checkUnique })
                     }
                 }
             }
         }
 
-        const chat = await Chat.create({ chat_name: chat_name, type: "CHAT" });
+        const chat = await Chat.create({ chat_name: "personal chat", type: "CHAT" });
         const chat_settings1 = await Chat_settings.create({ chatId: chat.id, userId: id })
         const chat_settings2 = await Chat_settings.create({ chatId: chat.id, userId: user_id })
-        return res.json({ chat, chat_settings1, chat_settings2 })
+        return res.json({ result: chat })
     }
 
     // создание беседы пользователем
@@ -115,16 +113,25 @@ class UserController {
         const { id } = req.user
         const security_Chat_settings = await Chat_settings.findOne({ userId: id, chatId: chat_id })
         if (!security_Chat_settings) {
-            return res.json({message: "Данные введены некорректно"})
+            return res.json({ message: "Данные введены некорректно" })
         }
         const security_Chat = await Chat.findOne({})
         if (security) {
             const deleteChat = await Chat.drop({ where: { id: chat_id } })
         }
+    }
 
+    async messageHistory(req, res) {
+        const { chat_id } = req.body
+        const history = await Message.findAll({ where: { chatId: chat_id } })
+        return res.json({ history })
+    }
 
-
-
+    async sendMessage(req, res) {
+        const { chat_id, content } = req.body
+        const { id } = req.user
+        const message = await Message.create({ userId: id, chatId: chat_id, content: content })
+        return res.json({ message })
     }
 }
 

@@ -1,72 +1,63 @@
-import { React, useRef, useState } from 'react'
-import axios from "axios"
+import { React, useContext, useEffect, useRef, useState } from 'react'
 import './MainPage.css'
 import { UsersList } from '../InterfaceElements/UsersList';
 import { Navbar } from '../InterfaceElements/Navbar';
 import "./MainPage.css"
+import { myUsername, userId } from '../http/userAPI';
+import { chatLink, userList } from '../http/actionAPI';
+import { Context } from '../main';
+import { useNavigate } from 'react-router-dom';
 
 // Страница со списком пользователей, списком чатов
 function MainPage() {
-  const [messages, setMessages] = useState([]);
-  const [value, setValue] = useState('');
-  const socket = useRef();
-  const [connected, setConnected] = useState(false);
-  const [userName, setUserName] = useState('');
+  const navigate = useNavigate()
+  const [user_Id, setUser_Id] = useState('') // id пользователя, который авторизован
+  const [myUserName, setMyUserName] = useState('')
+  const [dataUserList, setDataUserList] = useState([]); // список пользователей и ссылки
+  const [content, setContent] = useState(''); // текст одного сообщения
 
-  // const connect = () => {
-  //   socket.current = new WebSocket('ws://localhost:5000')
+  const getUserId = async () => {
+    const user = await userId()
+    setUser_Id(user)
+  }
 
-  //   socket.current.onopen = () => {
-  //     setConnected(true);
-  //     console.log('Подключение установлено');
+  const getMyUserName = async () => {
+    const myUserName = await myUsername()
+    setMyUserName(myUserName)
+  }
 
-  //     const requestData = {
-  //       action: 'getUserList',
-  //       data: {}
-  //     }
+  const getUserList = async () => {
+    let chat_Link = [];
+    let user_List = await userList();
+    await Promise.all(user_List.map(async (item) => {
+      const link = await chatLink(item.id);
+      chat_Link.push({ userId: item.id, userName: item.name, chatLink: link });
+    }));
+    setDataUserList(chat_Link);
+  }
 
-  //     // const message = {
-  //     //   event: 'connection',
-  //     //   userName,
-  //     //   id: Date.now()
-  //     // }
-
-  //     socket.current.send(JSON.stringify(requestData))
-  //   }
-
-  //   socket.current.onmessage = (event) => {
-  //     // обмен происходит в строковом формате,
-  //     // поэтому data парсим в сообщения
-  //     const message = JSON.parse(event.data)
-  //     // вернули массив, добавили сообщение, развернули старое состояние
-  //     setMessages(prev => [message, ...prev])
-  //   }
-
-  //   socket.current.onclose = () => {
-  //     console.log('Сервер закрыт');
-  //   }
-
-  //   socket.current.onerror = () => {
-  //     console.log('Socket произошла ошибка');
-  //   }
-  // }
-
-  // const sendMessage = async () => {
-  //   const message = {
-  //     userName,
-  //     message: value,
-  //     id: Date.now(),
-  //     event: 'message'
-  //   }
-  //   socket.current.send(JSON.stringify(message));
-  //   setValue('')
-  // }
+  useEffect(() => {
+    getUserId();
+    getUserList();
+    getMyUserName();
+  }, [])
 
   return (
     <div className='mainPage'>
-      <UsersList />
+      <UsersList userList={dataUserList} myName={myUserName} />
       <div className='mainPage__side'>
         <Navbar text={'Чаты'} />
+        <div>
+          {
+            dataUserList.map(user => (
+              <div onClick={() => {
+                navigate(`/chats/${user.chatLink}`)
+              }} className="user" key={user.userId}>
+                <h5>{user.userName}</h5>
+              </div>
+            ))
+          }
+        </div>
       </div>
     </div>
   )

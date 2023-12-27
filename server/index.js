@@ -1,5 +1,5 @@
-import express from "express";
-import WebSocket, { WebSocketServer } from "ws";
+import express, { json } from "express";
+import { WebSocketServer } from "ws";
 import sequelize from "./db.js";
 import models from "./models/models.js";
 import cors from "cors"
@@ -17,74 +17,52 @@ const start = async () => {
         await sequelize.authenticate() // аутентификация пользователя
         await sequelize.sync() // сверка состояния бд со схемой данных в models
 
-        const server = app.listen(5000, () => console.log('Сервер HTTP стартовал на порту номер 5000'))
+        const server = app.listen(5000, () => console.log('Сервер стартовал на порту номер 5000'))
 
-        const wss = new WebSocketServer({server})
-        // const wss = new WebSocket.Server({server})
-
-        process.on("message", (message) => {
-            console.log(message);
-        });
-
-        wss.on("test", (socket) => {
-            socket.send()
-        })
+        const wss = new WebSocketServer({ server })
 
         wss.on('connection', function connection(ws) {
-            console.log('123');
             ws.on('message', function (message) {
-                // парсинг из json-объекта в объект JS
-                message = JSON.parse(message);
-
-                switch (message.event) {
+                const parsedMessage = JSON.parse(message)
+                let idRoom
+                switch (parsedMessage.event) {
                     case 'connection':
-                        broadcastMessage(message)
+                        idRoom = parsedMessage.idRoom;
+                        ws.id = idRoom;
+                        const messageHistory = models.Message.findAll({ where: { chatId: idRoom }, order: [['createdAt']] })
+                        messageHistory.then(messages => {
+                            wss.clients.forEach((client) => {
+                                if (client.id == idRoom) {
+                                    messages.map(({ id, content, createdAt, userId }) => {
+                                        client.send(
+                                            JSON.stringify(
+                                                { event: 'history', id, content, createdAt, userId }
+                                            )
+                                        )
+                                    })
+                                }
+                            })
+                        })
+                        console.log(`Подключение установлено ${idRoom}`);
                         break;
                     case 'message':
-                        broadcastMessage(message)
+                        // отправка сообщений в бд
+                        const { id, chat_id, content } = parsedMessage
+                        const newMessage = models.Message.create({ userId: id, chatId: chat_id, content: content })
+                        newMessage.then(message => {
+                            wss.clients.forEach((client) => {
+                                if (client.id == idRoom) {
+                                    client.send(JSON.stringify({ event: 'message', content: message.content, createdAt: message.createdAt, userId: id }))
+                                }
+                            })
+                        })
                         break;
                 }
             })
         })
 
-        function broadcastMessage(message) {
-            wss.clients.forEach((client) => {
-                client.send(JSON.stringify(message))
-            })
-        }
     } catch (error) {
         console.log(error);
-    }
-}
-
-const match = false
-
-if (match) {
-
-    const wss = new WebSocketServer({
-        port: 5000,
-    }, () => console.log(`Сервер WebSocket стартовал на порту номер 5000`))
-
-    wss.on('connection', function connection(ws) {
-        ws.on('message', function (message) {
-            // парсинг из json-объекта в объект JS
-            message = JSON.parse(message);
-
-            switch (message.event) {
-                case 'connection':
-                    broadcastMessage(message)
-                    break;
-                case 'message':
-                    broadcastMessage(message)
-                    break;
-            }
-        })
-    })
-
-    function broadcastMessage(message) {
-        wss.clients.forEach((client) => {
-            client.send(JSON.stringify(message))
-        })
     }
 }
 

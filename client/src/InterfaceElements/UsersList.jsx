@@ -3,11 +3,9 @@ import './UsersList.css'
 import { useContext } from 'react'
 import { Context } from '../main'
 import { useNavigate } from 'react-router-dom'
-import { LOGIN_ROUTE } from '../utils/consts'
-import { check } from '../http/userAPI'
 
-export const UsersList = observer(() => {
-    const {user} = useContext(Context)
+export const UsersList = observer(({userList, myName}) => {
+    const { user } = useContext(Context)
     const navigate = useNavigate()
 
     const logOut = () => {
@@ -15,19 +13,22 @@ export const UsersList = observer(() => {
         user.setUser({})
         user.setIsAuth(false)
         location.reload()
-        // navigate(LOGIN_ROUTE)
     }
 
     return (
         <div className="sidePanel">
-            <h1>Пользователи</h1>
+            <h1 className='sidePanel_title'>Пользователи</h1>
             <div className="usersList">
-                <div className="user">
-                    <h5>Имя Пользователя</h5>
-                </div>
+                {userList.map(user => (
+                    <div onClick={() => {
+                        navigate(`/chats/${user.chatLink}`)
+                    }} className="user" key={user.userId}>
+                        <h5>{user.userName}</h5>
+                    </div>
+                ))}
             </div>
             <div className="master">
-                <h4>Имя аккаунта</h4>
+                <h4>{myName}</h4>
                 <button onClick={() => logOut()} className='btnOutdoor'>Выйти</button>
             </div>
         </div>

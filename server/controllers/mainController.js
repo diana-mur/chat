@@ -65,6 +65,16 @@ class MainController {
         const token = generateJWT(req.user.id, req.user.email, req.user.name, req.user.role)
         res.json({ token })
     }
+
+    async userId(req, res, next) {
+        const { id } = req.user;
+        res.json({ id })
+    }
+
+    async myUsername(req, res) {
+        const { name } = req.user;
+        res.json({ name })
+    }
 }
 
 export default new MainController()

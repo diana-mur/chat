@@ -1,5 +1,5 @@
-import React, { createContext, useContext } from 'react';
-import { Navigate, Route, Routes, createBrowserRouter } from "react-router-dom";
+import React, { useContext } from 'react';
+import { Navigate, Route, Routes } from "react-router-dom";
 import { ADMIN_ROUTE, LOGIN_ROUTE, MAIN_ROUTE, REG_ROUTE } from "../utils/consts";
 import Auth from '../pages/Auth.jsx';
 import Chat from '../pages/Chat.jsx';
@@ -12,33 +12,6 @@ function AppRouter() {
 
     const CheckRoleMiddleware = false
 
-    // const router = createBrowserRouter([
-    //     {
-    //         path: LOGIN_ROUTE,
-    //         element: <Auth />,
-    //     },
-    //     {
-    //         path: REG_ROUTE,
-    //         element: <Auth />,
-    //     },
-    //     {
-    //         path: MAIN_ROUTE + '/:id',
-    //         element: user.isAuth ? <Chat /> : <Navigate to={LOGIN_ROUTE} />,
-    //     },
-    //     {
-    //         path: MAIN_ROUTE,
-    //         element: user.isAuth ? <MainPage /> : <Navigate to={LOGIN_ROUTE} />,
-    //     },
-    //     {
-    //         path: ADMIN_ROUTE,
-    //         element: CheckRoleMiddleware ? <Admin /> : <Navigate to={LOGIN_ROUTE} />,
-    //     },
-    //     {
-    //         path: '*',
-    //         element: <Navigate to={LOGIN_ROUTE} />,
-    //     },
-    // ]);
-
     console.log(user);
 
     return (
@@ -49,27 +22,24 @@ function AppRouter() {
             />
             <Route
                 path={REG_ROUTE}
-                element={<Auth />} />
+                element={<Auth />}
+            />
             <Route
                 path={MAIN_ROUTE + '/:id'}
-                element={user.isAuth ? <Chat /> : <Navigate to="/login" />}
-                // element={<Chat />}
+                element={user.isAuth ? <Chat /> : <Navigate to={LOGIN_ROUTE} />}
             />
             <Route
                 path={MAIN_ROUTE}
-                element={user.isAuth ? <MainPage /> : <Navigate to="/login" />}
-                // element={<MainPage />}
+                element={user.isAuth ? <MainPage /> : <Navigate to={LOGIN_ROUTE} />}
             />
             <Route
                 path={ADMIN_ROUTE}
                 element={CheckRoleMiddleware ? <Admin /> : <Navigate to={LOGIN_ROUTE} />}
-                // element={<Admin />}
             />
             <Route
                 path="*"
-                element={<Navigate to="/login" />}
+                element={<Navigate to={MAIN_ROUTE} />}
             />
-
         </Routes>
     );
 }
