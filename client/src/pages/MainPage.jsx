@@ -5,7 +5,6 @@ import { Navbar } from '../InterfaceElements/Navbar';
 import "./MainPage.css"
 import { myUsername, userId } from '../http/userAPI';
 import { chatLink, userList } from '../http/actionAPI';
-import { Context } from '../main';
 import { useNavigate } from 'react-router-dom';
 
 // Страница со списком пользователей, списком чатов
@@ -14,7 +13,6 @@ function MainPage() {
   const [user_Id, setUser_Id] = useState('') // id пользователя, который авторизован
   const [myUserName, setMyUserName] = useState('')
   const [dataUserList, setDataUserList] = useState([]); // список пользователей и ссылки
-  const [content, setContent] = useState(''); // текст одного сообщения
 
   const getUserId = async () => {
     const user = await userId()

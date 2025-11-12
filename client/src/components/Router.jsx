@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import { Navigate, Route, Routes } from "react-router-dom";
 import { ADMIN_ROUTE, LOGIN_ROUTE, MAIN_ROUTE, REG_ROUTE } from "../utils/consts";
-import Auth from '../pages/Auth.jsx';
+import Auth from '../auth/Auth.jsx';
 import Chat from '../pages/Chat.jsx';
 import MainPage from '../pages/MainPage.jsx';
 import { Context } from '../main.jsx';

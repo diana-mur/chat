@@ -1,9 +1,0 @@
-.mainPage {
-  display: flex;
-}
-
-.mainPage__side {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-}

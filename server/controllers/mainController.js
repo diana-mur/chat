@@ -7,9 +7,6 @@ import bcrypt from "bcrypt";
 import jwt from 'jsonwebtoken';
 
 const User = models.User;
-const Chat = models.Chat;
-const Chat_settings = models.Chat_settings;
-const Message = models.Message;
 
 const generateJWT = (id, name, email, role) => {
     return jwt.sign(

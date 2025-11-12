@@ -7,7 +7,8 @@
     font-family: 'Montserrat', sans-serif;
 }
 
-body, #root {
+body,
+#root {
     min-width: 100vw;
     min-height: 100vh;
     overflow: hidden;
@@ -44,3 +45,178 @@ p {
 a {
     text-decoration: none;
 }
+
+.navbar {
+    width: 100%;
+    height: 70px;
+    display: flex;
+    align-items: center;
+    padding: 0 10px;
+    background-color: rgb(183, 255, 170);
+}
+
+
+.sidePanel {
+    width: 400px;
+    height: 100vh;
+    box-shadow: 4px 0px 8px 0px rgba(34, 60, 80, 0.2);
+    ;
+}
+
+.sidePanel_title {
+    padding: 10px 0;
+    margin: 0 20px;
+    border-bottom: 1px solid #c5c5c5;
+}
+
+.usersList {
+    width: 100%;
+    height: calc(100vh - 120px);
+    overflow-y: auto;
+}
+
+.user {
+    height: 60px;
+    border-bottom: 1px solid #a3a3a3;
+    display: flex;
+    align-items: center;
+    margin: 0 10px;
+    padding: 0 10px;
+}
+
+.master {
+    width: 100%;
+    height: 60px;
+    border-top: 1px solid #c5c5c5;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 15px;
+    background-color: white;
+}
+
+.btnOutdoor {
+    padding: 10px;
+    border: none;
+    background-color: rgb(185, 255, 173);
+    border-radius: 10px;
+    font-size: 16px;
+}
+
+
+.background {
+    background-color: rgb(185, 252, 212);
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.signIn {
+    background-color: white;
+    padding: 50px 70px;
+    border-radius: 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    min-width: 350px;
+}
+
+.input_form {
+    padding: 10px;
+    border: 1px solid #acaaaa;
+    border-radius: 7px;
+    margin: 7px 0 13px;
+    font-size: 16px;
+}
+
+.button_form {
+    font-size: 20px;
+    padding: 10px;
+    border: none;
+    border-radius: 7px;
+    background-color: rgb(165, 246, 198);
+}
+
+.a_text {
+    color: rgb(29, 219, 156);
+}
+
+.text_form {
+    margin: 0 0 15px 0;
+}
+
+.a_form {
+    color: white;
+}
+
+
+.chat {
+    display: flex;
+}
+
+.chat__side {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.chat__messages {
+    height: 80vh;
+    overflow-y: auto;
+}
+
+.message {
+    display: flex;
+    flex-direction: column;
+    padding: 10px 0;
+    margin: 0 20px;
+    border-bottom: 1px solid #c5c5c5;
+}
+
+.title_message {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.input_place {
+    position: relative;
+}
+
+.input_message {
+    font-size: 16px;
+    padding: 10px 60px 10px 20px;
+    border: 1px solid #c5c5c5;
+    border-radius: 20px;
+    width: 98.5%;
+    margin: 10px;
+}
+
+.sendMessage {
+    background-color: inherit;
+    border: none;
+    position: absolute;
+    top: 20px;
+    right: 30px;
+    z-index: 300;
+}
+
+
+.mainPage {
+    display: flex;
+}
+
+.mainPage__side {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+

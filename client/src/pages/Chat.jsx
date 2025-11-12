@@ -1,16 +1,14 @@
-import { useContext, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { UsersList } from "../InterfaceElements/UsersList";
 import { Navbar } from "../InterfaceElements/Navbar";
-import "./Chat.css"
+// import "./Chat.css"
 import { chatLink, userList } from "../http/actionAPI";
 import { useParams } from "react-router-dom";
-import { myUsername, userId } from "../http/userAPI";
-import { Context } from "../main";
+// import { myUsername, userId } from "../http/userAPI";
 import send from "../assets/send.svg"
 
 function Chat() {
     const socket = useRef();
-    const { user } = useContext(Context)
     const [user_Id, setUser_Id] = useState('') // id пользователя, который авторизован
     const [myUserName, setMyUserName] = useState('')
     const { id } = useParams() // id со строки 
